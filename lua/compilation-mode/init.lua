@@ -57,6 +57,11 @@ function M.CompileModeAdd(cmd)
   harpoon:list("cmd"):prepend({ value = cmd })
 end
 
+function M.CompileModeAddEnd(cmd)
+  print(string.format("Adding command: %s", cmd))
+  harpoon:list("cmd"):add({ value = cmd })
+end
+
 function M.CompileModeClear()
   harpoon:list("cmd"):clear()
 end
@@ -91,6 +96,9 @@ function M.setup(opts)
   -- Define User Commands
   vim.api.nvim_create_user_command("CompileModeAdd", function(opts)
     M.CompileModeAdd(opts.args)
+  end, { nargs = '?' })
+  vim.api.nvim_create_user_command("CompileModeAddEnd", function(opts)
+    M.CompileModeAddEnd(opts.args)
   end, { nargs = '?' })
 
   vim.api.nvim_create_user_command("CompileModeClear", function()
