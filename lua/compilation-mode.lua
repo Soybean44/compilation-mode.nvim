@@ -1,0 +1,5 @@
+---
+--- Title: compilation-mode.nvim
+--- Desc: Main file for the compilation-mode.nvim plugin
+--- Author: Soybean44
+---
