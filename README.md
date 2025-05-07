@@ -1,8 +1,17 @@
 # compilation-mode.nvim
 
+## Table of Contents
+
+- [Description](#Description)
+- [Instalation](#Instalation)
+- [Usage](#Usage)
+- [Configuration](#Configuration) (TBD)
+
+## Description
+
 After watching the youtuber [Tsoding](https://youtube.com/tsodingdaily), I found him using this feature called compilation mode in emacs. It looked really cool and I decided to put together a haphazard plugin to emulate this behaviour.
 
-The functionality of this plugin mimicks the workflow of [harpoon](https://github.com/ThePrimeagen/harpoon), and if you aren't on harpoon2, good news this is built into the plugin so you don't need to rely on my spaghetti code. If you are on the new version, then you have come to the right place.
+The functionality of this plugin mimicks the workflow of [harpoon](https://github.com/ThePrimeagen/harpoon), and if you aren't on harpoon2, good news this is built into the plugin so you don't need to rely on my spaghetti code, . If you are on the new version, then you have come to the right place.
 
 ## Instalation
 
