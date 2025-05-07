@@ -54,4 +54,26 @@ Note that `:CompileModeSend` will send the first item (top item) in the command 
 
 ## Configuration
 
-TBD
+Inside the setup function you can specify options. The default options are as follows
+
+```lua
+{
+  send_cmd = function(cmd)
+    return {
+      "tmux",
+      "send-keys",
+      "-t1",
+      string.format('%s', cmd),
+      ";",
+      "send-keys",
+      "-t1",
+      "Enter",
+      ";",
+      "select-window",
+      "-t1",
+    }
+  end
+}
+```
+
+`send_cmd` specifies the command run which sends the desired location. In theory if you wanted to you could use any command here to process your commands and send it here. This command should be tweaked so that you can send a command to another tmux pane instead of the first pane in the next window
