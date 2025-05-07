@@ -31,19 +31,7 @@ function M.RunCommand(cmd)
     local file_path = vim.api.nvim_buf_get_name(buf_id)
     cmd = string.gsub(cmd, "$CURRENT_FILE", file_path)
   end
-  local _, ret, stderr = get_os_command_output({
-    "tmux",
-    "send-keys",
-    "-t1",
-    string.format('%s', cmd),
-    ";",
-    "send-keys",
-    "-t1",
-    "Enter",
-    ";",
-    "select-window",
-    "-t1",
-  }, vim.loop.cwd())
+  local _, ret, stderr = get_os_command_output(M.send_cmd(cmd), vim.loop.cwd())
   print(string.format('sending command: %s', harpoon:list("cmd"):get(1).value))
   if ret ~= 0 then
     if stderr then
@@ -80,7 +68,25 @@ end
 
 function M.setup(opts)
   -- Merge user options with defaults
-  opts = opts or {}
+  opts = opts or {
+    send_cmd = function(cmd)
+      return {
+        "tmux",
+        "send-keys",
+        "-t1",
+        string.format('%s', cmd),
+        ";",
+        "send-keys",
+        "-t1",
+        "Enter",
+        ";",
+        "select-window",
+        "-t1",
+      }
+    end
+  }
+
+  M.send_cmd = opts.send_cmd
 
   harpoon:setup({
     settings = {

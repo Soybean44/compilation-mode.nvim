@@ -48,6 +48,7 @@ Typical useage is with the command `:CompileModeAdd <cmd>` or by editing the har
 | `compilation_mode.CompileModeClear()`     | `:CompileModeClear`      | Clears the command list                                            |
 | `compilation_mode.CompileModeList()`      | `:CompileModeList`       | Opens the command list                                             |
 | `compilation_mode.CompileModeSend(item)`  | `:CompileModeSend item`  | Sends the specified item in the command list to the next tmux pane |
+| `compilation_mode.RunCommand(cmd)`        | `:RunCommand cmd`        | Sends the command passed in to the next tmux pane                  |
 
 Note that `:CompileModeSend` will send the first item (top item) in the command list when an argument is not specified
 
