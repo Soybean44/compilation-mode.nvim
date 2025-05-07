@@ -1,7 +1,5 @@
 # compilation-mode.nvim
 
-## Table of Contents
-
 - [Description](#Description)
 - [Instalation](#Instalation)
 - [Usage](#Usage)
