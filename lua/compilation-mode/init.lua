@@ -1,6 +1,30 @@
 local harpoon = require("harpoon")
 
 local M = {}
+local config = {
+  send_window = "",
+  send_pane = "1",
+  do_swap = false,
+  send_cmd = function(cmd, send_window, send_pane)
+    return {
+      "tmux",
+      "send-keys",
+      string.format('-t:%s.%s', send_window, send_pane),
+      string.format('%s', cmd),
+      "Enter",
+    }
+  end,
+  swap_cmd = function(send_window, send_pane)
+    return {
+      "tmux",
+      "select-window",
+      string.format('-t:%s', send_window),
+      ";",
+      "select-pane",
+      string.format('-t:%s', send_pane),
+    }
+  end
+}
 
 function M.RunCommand(cmd)
   local function get_os_command_output(input_cmd, cwd)
@@ -31,11 +55,20 @@ function M.RunCommand(cmd)
     local file_path = vim.api.nvim_buf_get_name(buf_id)
     cmd = string.gsub(cmd, "$CURRENT_FILE", file_path)
   end
-  local _, ret, stderr = get_os_command_output(M.send_cmd(cmd), vim.loop.cwd())
+  local _, ret, stderr = get_os_command_output(config.send_cmd(cmd, config.send_window, config.send_pane), vim.loop.cwd())
   print(string.format('sending command: %s', harpoon:list("cmd"):get(1).value))
   if ret ~= 0 then
     if stderr then
       error("Failed to send command. " .. stderr[1])
+    end
+  end
+  if config.do_swap then
+    local _, ret, stderr = get_os_command_output(config.swap_cmd(config.send_window, config.send_pane), vim.loop.cwd())
+    print(string.format('sending command: %s', harpoon:list("cmd"):get(1).value))
+    if ret ~= 0 then
+      if stderr then
+        error("Failed to send command. " .. stderr[1])
+      end
     end
   end
 end
@@ -68,25 +101,12 @@ end
 
 function M.setup(opts)
   -- Merge user options with defaults
-  opts = opts or {
-    send_cmd = function(cmd)
-      return {
-        "tmux",
-        "send-keys",
-        "-t1",
-        string.format('%s', cmd),
-        ";",
-        "send-keys",
-        "-t1",
-        "Enter",
-        ";",
-        "select-window",
-        "-t1",
-      }
-    end
-  }
 
-  M.send_cmd = opts.send_cmd
+  config.send_cmd = opts.send_cmd or config.send_cmd
+  config.swap_cmd = opts.swap_cmd or config.swap_cmd
+  config.do_swap = opts.do_swap or config.do_swap
+  config.send_window = opts.send_window or config.send_window
+  config.send_pane = opts.send_pane or config.send_pane
 
   harpoon:setup({
     settings = {

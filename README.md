@@ -41,14 +41,14 @@ If you are using any other plugin manager it should be fairly similar
 
 Typical useage is with the command `:CompileModeAdd <cmd>` or by editing the harpoon list from `:CompileModeList`. Every command has a corresponding lua function in the library as shown in the example config. The list of functions are as follows
 
-| Lua                                       | Command                  | Description                                                        |
-| ----------------------------------------- | ------------------------ | ------------------------------------------------------------------ |
-| `compilation_mode.CompileModeAdd(cmd)`    | `:CompileModeAdd cmd`    | Adds a new command to the top of the command list                  |
-| `compilation_mode.CompileModeAddEnd(cmd)` | `:CompileModeAddEnd cmd` | Adds a new command to the bottom of the command list               |
-| `compilation_mode.CompileModeClear()`     | `:CompileModeClear`      | Clears the command list                                            |
-| `compilation_mode.CompileModeList()`      | `:CompileModeList`       | Opens the command list                                             |
-| `compilation_mode.CompileModeSend(item)`  | `:CompileModeSend item`  | Sends the specified item in the command list to the next tmux pane |
-| `compilation_mode.RunCommand(cmd)`        | `:RunCommand cmd`        | Sends the command passed in to the next tmux pane                  |
+| Lua                                       | Command                  | Description                                                          |
+| ----------------------------------------- | ------------------------ | -------------------------------------------------------------------- |
+| `compilation_mode.CompileModeAdd(cmd)`    | `:CompileModeAdd cmd`    | Adds a new command to the top of the command list                    |
+| `compilation_mode.CompileModeAddEnd(cmd)` | `:CompileModeAddEnd cmd` | Adds a new command to the bottom of the command list                 |
+| `compilation_mode.CompileModeClear()`     | `:CompileModeClear`      | Clears the command list                                              |
+| `compilation_mode.CompileModeList()`      | `:CompileModeList`       | Opens the command list                                               |
+| `compilation_mode.CompileModeSend(item)`  | `:CompileModeSend item`  | Sends the specified item in the command list to the target tmux pane |
+| `compilation_mode.RunCommand(cmd)`        | `:RunCommand cmd`        | Sends the command passed in to the target tmux pane                  |
 
 Note that `:CompileModeSend` will send the first item (top item) in the command list when an argument is not specified
 
@@ -58,22 +58,33 @@ Inside the setup function you can specify options. The default options are as fo
 
 ```lua
 {
-  send_cmd = function(cmd)
+  send_window = "",
+  send_pane = "1",
+  do_swap = false,
+  send_cmd = function(cmd, send_window, send_pane)
     return {
       "tmux",
       "send-keys",
-      "-t1",
+      string.format('-t:%s.%s', send_window, send_pane),
       string.format('%s', cmd),
-      ";",
-      "send-keys",
-      "-t1",
       "Enter",
-      ";",
+    }
+  end,
+  swap_cmd = function(send_window, send_pane)
+    return {
+      "tmux",
       "select-window",
-      "-t1",
+      string.format('-t:%s', send_window),
+      ";",
+      "select-pane",
+      string.format('-t:%s', send_pane),
     }
   end
 }
 ```
 
-`send_cmd` specifies the command run which sends the desired location. In theory if you wanted to you could use any command here to process your commands and send it here. This command should be tweaked so that you can send a command to another tmux pane instead of the first pane in the next window
+`send_window` and `send_pane` are what most users will configure to target their pane and window. These must be strings and an empty string will default to the current pane/window (though it is unlikely a user will want to send text to the current pane the option is there).
+`send_cmd` and `swap_cmd` is used if you want to twek how the command is send. I personally have no experience with other terminal multiplexers but it could be used to configure them. These are lists of arguments to the command, where each element in the final command will be appended by spaces
+`do_swap` is a boolean which enables the swap command. It is off by default but if you want to automatically swap to the target pane (i.e. to pass user input) it can be handy.
+
+The default pane will be the pane with id 1 (pane id's found by doing `prefix q` in tmux) in your current window and you can configure this to your liking
